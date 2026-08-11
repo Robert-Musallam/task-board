@@ -106,30 +106,35 @@ valor de `synthesis`):
 
 ```json
 {
-  "summary": "una línea, estado general de la tarea",
-  "logrado": ["punto concreto ya resuelto", "..."],
-  "pendiente": ["qué falta, en curso ahora", "..."],
-  "bloqueos": ["qué está trabado y por qué", "fuente inaccesible: <cual>", "..."],
+  "summary": "one line, overall state of the task",
+  "logrado": ["concrete point already resolved", "..."],
+  "pendiente": ["what's missing, in progress now", "..."],
+  "bloqueos": ["what's stuck and why", "unreachable source: <which>", "..."],
   "links": [{"label": "PR #12", "url": "https://github.com/org/repo/pull/12"}],
-  "generated_at": "<timestamp ISO 8601 UTC del momento de la corrida>"
+  "generated_at": "<ISO 8601 UTC timestamp of this run>"
 }
 ```
 
+Los nombres de las claves (`logrado`/`pendiente`/`bloqueos`) se quedan tal cual, en
+español, porque son parte del contrato de datos con la UI (`lib/types.ts`) — no los
+traduzcas. Lo que sí va **en inglés siempre** es el contenido: `summary`, cada bullet
+de `logrado`/`pendiente`/`bloqueos`, y `label` de cada link. La UI está en inglés; la
+síntesis tiene que estarlo también.
+
 Reglas de contenido:
 
-- `logrado`/`pendiente`/`bloqueos` son arrays de bullets cortos, en español, sin relleno
-  — si una fuente no aporta nada nuevo desde el último sync, no inventes texto.
-  Preferí "sin novedades desde el último sync" antes que forzar un bullet vacío de
-  contenido.
+- `logrado`/`pendiente`/`bloqueos` son arrays de bullets cortos, **en inglés**, sin
+  relleno — si una fuente no aporta nada nuevo desde el último sync, no inventes texto.
+  Preferí "no updates since last sync" antes que forzar un bullet vacío de contenido.
 - `links` son hallazgos automáticos de las fuentes (PRs, hilos de Slack, mensajes
   puntuales) — **no** es lo mismo que la columna `links` de la tabla, que administra la
   persona a mano desde la UI. No toques esa columna.
 - Si las tres listas (`logrado`, `pendiente`, `bloqueos`) quedan vacías porque ninguna
-  fuente resolvió, igual escribí el objeto con arrays vacíos y `summary: "sin datos de
-  las fuentes configuradas"` — no dejes `synthesis` en null salvo que la tarea no tenga
+  fuente resolvió, igual escribí el objeto con arrays vacíos y `summary: "no data from
+  configured sources"` — no dejes `synthesis` en null salvo que la tarea no tenga
   ninguna `context_source` configurada.
 - Si `context_sources` está vacío (`{}` o sin claves con contenido), escribí
-  `summary: "sin fuentes configuradas"` y arrays vacíos — no marques error.
+  `summary: "no sources configured"` y arrays vacíos — no marques error.
 
 ## Paso 4 — Escribir el resultado
 
