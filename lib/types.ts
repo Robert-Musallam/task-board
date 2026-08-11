@@ -29,6 +29,7 @@ export type BoardTask = {
   links: BoardTaskLink[] | null;
   context_sources: BoardTaskContextSources | null;
   last_synced_at: string | null;
+  sync_requested_at: string | null;
   created_at: string;
   updated_at: string;
 };
