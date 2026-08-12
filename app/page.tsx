@@ -1,7 +1,5 @@
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import { ALLOWED_EMAILS } from "@/lib/allowlist";
-import { createTask, signOutAction } from "./actions";
+import { createClient } from "@/lib/supabase";
+import { createTask } from "./actions";
 import { TaskCard } from "@/components/TaskCard";
 import type { BoardTask, BoardTaskStatus } from "@/lib/types";
 
@@ -37,18 +35,7 @@ const COLUMN_STYLES: Record<
 };
 
 export default async function Home() {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) redirect("/login");
-
-  if (!user.email || !ALLOWED_EMAILS.includes(user.email)) {
-    await supabase.auth.signOut();
-    redirect("/login?error=not_allowed");
-  }
+  const supabase = createClient();
 
   const { data: tasks, error } = await supabase
     .from("board_tasks")
@@ -69,14 +56,6 @@ export default async function Home() {
     <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-4 p-4 sm:p-6">
       <header className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Task Board</h1>
-        <form action={signOutAction}>
-          <button
-            type="submit"
-            className="text-sm text-neutral-500 hover:underline"
-          >
-            {user.email} · Sign out
-          </button>
-        </form>
       </header>
 
       <details className="rounded-lg border border-neutral-200 bg-white">

@@ -1,8 +1,7 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase";
 import type { BoardTaskStatus } from "@/lib/types";
 
 const VALID_STATUSES: BoardTaskStatus[] = ["todo", "in_progress", "done"];
@@ -20,7 +19,7 @@ function parseList(value: FormDataEntryValue | null): string[] {
 }
 
 export async function createTask(formData: FormData) {
-  const supabase = await createClient();
+  const supabase = createClient();
 
   const title = String(formData.get("title") ?? "").trim();
   if (!title) return;
@@ -46,7 +45,7 @@ export async function requestSyncAction(formData: FormData) {
   const id = String(formData.get("id") ?? "");
   if (!id) return;
 
-  const supabase = await createClient();
+  const supabase = createClient();
   const { error } = await supabase
     .from("board_tasks")
     .update({ sync_requested_at: new Date().toISOString() })
@@ -63,7 +62,7 @@ export async function updateStatusAction(formData: FormData) {
 
   if (!id || !VALID_STATUSES.includes(status as BoardTaskStatus)) return;
 
-  const supabase = await createClient();
+  const supabase = createClient();
   const { error } = await supabase
     .from("board_tasks")
     .update({ status })
@@ -72,10 +71,4 @@ export async function updateStatusAction(formData: FormData) {
   if (error) throw new Error(error.message);
 
   revalidatePath("/");
-}
-
-export async function signOutAction() {
-  const supabase = await createClient();
-  await supabase.auth.signOut();
-  redirect("/login");
 }
